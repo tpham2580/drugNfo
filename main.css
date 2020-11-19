@@ -57,18 +57,6 @@ title h1 {
     background-color:#7f8eff;
 }
 
-.child {
-  min-width: 400px;
-}
-
-.instructions ul {
-  min-width: 400px;
-}
-
-.interactions {
-  min-width: 400px;
-}
-
 .content {
     display: none;
 }
