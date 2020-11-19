@@ -8,20 +8,66 @@
         <title>DrugNfo</title>
         <link rel="stylesheet" href="main.css" />
         <link rel="icon" href="images/heart-logo.png" />
+        
     </head>
 
     <body>
-        <h1>DrugNfo</h1>
+        <div class="container">
 
-        <nav>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="about-me.html">About Me</a></li>
-                <li><a href="note-on-usage.html">Note on Usage</a></li>
-                <li><a href="faq.html">FAQ</a></li>
-            </ul>
-        </nav>
+            <div class="child">
 
-        <script src="script.js"></script>
+                <h1 id="title"><img src="images/heart-logo.png" width="30" height="30" alt="Heart Logo">DrugNfo</h1>
+
+                <nav>
+                    <ul class="navbar">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="about-me.html">About Me</a></li>
+                        <li><a href="note-on-usage.html">Note on Usage</a></li>
+                        <li><a href="faq.html">FAQ</a></li>
+                    </ul>
+                </nav>
+
+                <br>
+
+                <div class="search">
+                    <input id="drug-input" type="text" placeholder="Medication...">
+                    <button id="search-med">Search</button>
+                    <button id="add-med">Add Medication</button>
+                </div> 
+
+                <div id="pdf">
+                    <h2 id="drug-information-header">Drug Information: </h2>
+                    <p><span id="brand-output"></span></p>
+                    <p><span id="generic-output"></span></p>
+
+                    <div id="interaction">
+                        <h2 id="interaction-list-header">Interaction List: </h2>
+                        <ul id="interaction-list">
+
+                        </ul>
+            
+                        <button id="check-interaction">Check for Interactions</button>
+                        <button id="reset-interaction">Reset</button>
+                        <button id="export-pdf">Generate PDF</button>
+                    </div>
+
+                    <br>
+
+                    <div class="interaction-display">
+
+                        <div id="no-interaction-div"></div>
+
+                        <div id="interaction-div"></div>
+
+                    </div>
+                </div>
+
+            </div>
+        
+        </div>
+
+        <script type="module" src="script.js"></script>
+
     </body>
+    
 </html>
