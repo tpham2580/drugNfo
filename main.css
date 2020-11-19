@@ -3,10 +3,12 @@
   padding: 15px 15px;
 }
 
+
+
 ul li {
     list-style-type: none;
     border-left: 6px solid #7f8eff;
-    padding: 10px 15px;
+    padding: 1% 2%;
     font-size: 20px;
     
   }
@@ -47,11 +49,24 @@ title h1 {
   }
 
 .navbar {
+    display: flex;
     list-style-type: none;
     margin: 0;
     padding: 0;
     overflow: hidden;
     background-color:#7f8eff;
+}
+
+.child {
+  min-width: 400px;
+}
+
+.instructions ul {
+  min-width: 400px;
+}
+
+.interactions {
+  min-width: 400px;
 }
 
 .content {
@@ -97,7 +112,7 @@ body {
 
 .searchButton {
   font-size: 1.0rem;
-  padding: 5px 10px;
+  padding: 1% 2%;
 }
 
 button {
@@ -166,4 +181,8 @@ button {
 
 footer p {
   font-size: 0.75rem;
+}
+
+html {
+  padding: 1%
 }
