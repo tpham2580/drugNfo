@@ -1,4 +1,4 @@
-import jsPDF from "jspdf.es";
+import jsPDF from "/node_modules/jspdf/dist/jspdf.es.js";
 
 //asynchronous call to grab drug generic and brand name
 document.getElementById('search-med').addEventListener('click', function(event){
