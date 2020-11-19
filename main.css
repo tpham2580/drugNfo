@@ -4,11 +4,15 @@
 }
 
 ul li {
-  list-style-type: none;
-  border-left: 6px solid #7f8eff;
-  padding: 10px 15px;
-  font-size: 20px;
-  
+    list-style-type: none;
+    border-left: 6px solid #7f8eff;
+    padding: 10px 15px;
+    font-size: 20px;
+    
+  }
+
+p {
+    font-size: 17px;
 }
 
 .navbar {
@@ -17,6 +21,14 @@ ul li {
     padding: 0;
     overflow: hidden;
     background-color:#7f8eff;
+}
+
+.content {
+    display: none;
+}
+
+.child {
+    margin: 0 auto;
 }
 
 .navbar li {
