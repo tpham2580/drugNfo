@@ -123,6 +123,16 @@ button {
     -moz-appearance: none;
   }
 
+#export-pdf {
+  background-color:#cc535f;
+}
+
+#export-pdf:hover {
+  color: black;
+  border: 1px solid #006398;
+  box-shadow: 2px 2px 20px black;
+}
+
 .interaction-display {
     padding: 10px 10px;
 }
