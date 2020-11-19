@@ -15,6 +15,27 @@ p {
     font-size: 17px;
 }
 
+.title-home-link {
+    text-decoration: none;
+    color: black;
+}
+
+.title-home-link:link{
+    color:black;
+  }
+.title-home-link:visited{
+    color:black;
+  }
+.title-home-link:hover{
+    color:black;
+  }
+.title-home-link:focus{
+    color:black;
+  }
+.title-home-link:active{
+    color:black;
+  }
+
 .navbar {
     list-style-type: none;
     margin: 0;

@@ -170,7 +170,10 @@ document.getElementById('export-pdf').addEventListener('click', function(event){
     var interaction_description = document.getElementsByClassName("interaction-description");
 
     pdf.setFont("times", "bold");
-    pdf.text("DrugNfo", 10, 15);
+    var image = document.createElement('img');
+    image.src = "images/heart-logo.png";
+    pdf.addImage(image, 8, 9, 7, 7)
+    pdf.text("DrugNfo", 15, 15);
 
     var x_coord = 10;
     var y_coord = 25;
