@@ -46,10 +46,13 @@
                 </ul>
 
                 <div class="search">
-                    <input id="drug-input" type="text" placeholder="Medication...">
-                    <button id="search-med">Search</button>
-                    <button id="add-med">Add Medication</button>
+                    <div class="wrap"></div>
+                    <input id="drug-input" class="searchTerm" type="search" placeholder="Medication...">
+                    <button id="search-med" class="searchButton">Search</button>
+                    <button id="add-med">Add</button>
                 </div> 
+
+                <div id="search-display"></div>
 
                 <div id="pdf">
                     <h2 id="drug-information-header">Drug Information: </h2>
@@ -61,22 +64,27 @@
                         <ul id="interaction-list">
 
                         </ul>
-            
+
+                        
+                        
+                        <div>
                         <button id="check-interaction">Check for Interactions</button>
                         <button id="reset-interaction">Reset</button>
-                        <button id="export-pdf">Generate PDF</button>
+                        </div>
                     </div>
 
                     <br>
 
                     <div class="interaction-display">
 
-                        <div id="no-interaction-div"></div>
-
                         <div id="interaction-div"></div>
 
+                        <button id="export-pdf">Generate PDF</button>
                     </div>
+                    
                 </div>
+
+                <br>
 
                 <footer>
                     <p>Do not rely on DrugNfo to make decisions on medical care.</p>

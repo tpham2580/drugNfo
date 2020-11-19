@@ -95,14 +95,18 @@ body {
     color: #981220;
 }
 
+.searchButton {
+  font-size: 1.0rem;
+  padding: 5px 10px;
+}
+
 button {
     border-radius: 5px;
-    font-size: 12px;
-    padding: 10px 30px;
+    padding: 5px 10px;
     cursor: pointer;
-    color: #fff;
-    background-color:#7f8eff;
-    font-size: 1.2rem;
+    color: #006398;
+    background-color:#e5e8ff;
+    font-size: 1.1rem;
     font-family: 'Roboto';
     font-weight: 100;
     border: 1px solid #fff;
@@ -124,10 +128,33 @@ button {
   }
 
 #export-pdf {
-  background-color:#cc535f;
+  background-color:#16090a;
+  color:  #e5e8ff;
 }
 
 #export-pdf:hover {
+  color:  #e5e8ff;
+  border: 1px solid #006398;
+  box-shadow: 2px 2px 20px #cc535f;
+}
+
+#reset-interaction {
+  background-color:#cc535f;
+  border: 1px solid #cc535f;
+}
+
+#reset-interaction:hover {
+  color: black;
+  border: 1px solid #006398;
+  box-shadow: 2px 2px 20px black;
+}
+
+#check-interaction {
+  background-color:#5fcc53;
+  border: 1px solid #5fcc53;
+}
+
+#check-interaction:hover {
   color: black;
   border: 1px solid #006398;
   box-shadow: 2px 2px 20px black;
@@ -136,3 +163,4 @@ button {
 .interaction-display {
     padding: 10px 10px;
 }
+

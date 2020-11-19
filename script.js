@@ -1,10 +1,12 @@
 import jsPDF from "./jspdf.es.js";
 
+// search display div
+var search_display = document.getElementById("search-display");
+
 //asynchronous call to grab drug generic and brand name
 document.getElementById('search-med').addEventListener('click', function(event){
     var req1 = new XMLHttpRequest({mozSystem: true});
     var drug = document.getElementById('drug-input').value;
-    var drugRx = "";
 
     req1.open('GET', 'https://rxnav.nlm.nih.gov/REST/rxcui.json?name=' + drug, true);
     req1.addEventListener('load',function(){
@@ -49,11 +51,32 @@ document.getElementById('add-med').addEventListener('click', function(event){
     req1.open('GET', 'https://rxnav.nlm.nih.gov/REST/rxcui.json?name=' + drug, true);
     req1.addEventListener('load',function(){
         if(req1.status >= 200 && req1.status < 400){
+            // clears the search display upon
+            clearSearchDisplay();
+
             var responseDrug = JSON.parse(req1.responseText);
-            var rxcui = responseDrug.idGroup["rxnormId"][0];
-            medication_list.push(rxcui);
-            makeList(drug);
-            document.getElementById("check-interaction").disabled = false;
+            if (responseDrug.idGroup["rxnormId"] == undefined){
+                var search_display_item = document.createElement('p');
+                search_display_item.textContent = '" ' + drug + ' "' + " could not be found";
+                search_display_item.setAttribute("class", "search-display")
+                search_display.appendChild(search_display_item);
+            } else {
+                var rxcui = responseDrug.idGroup["rxnormId"][0];
+                if (medication_list.includes(rxcui)){
+                    // clears the search display upon
+                    clearSearchDisplay();
+                    var search_display_item = document.createElement('p');
+                    search_display_item.textContent = '" ' + drug + ' "' + " is already in list";
+                    search_display_item.setAttribute("class", "search-display")
+                    search_display.appendChild(search_display_item);
+                } else {
+                    medication_list.push(rxcui);
+                    makeList(drug);
+                    document.getElementById("check-interaction").disabled = false;
+                }
+                
+            }
+            
         } else {
             console.log("Error in network request: " + req1.statusText);
         }});
@@ -91,17 +114,23 @@ document.getElementById('check-interaction').addEventListener('click', function(
             var response = JSON.parse(req2.responseText);
             resetInteractionComments();
             if ("fullInteractionTypeGroup" in response){
-                var no_interaction = document.createElement("h2");
-                no_interaction.setAttribute("id", "interaction-header")
-                no_interaction.textContent = "There is an interaction.";
-                interactions.appendChild(no_interaction);
+                // clears the search display upon
+                clearSearchDisplay();
+
+                var interaction_response = document.createElement("h2");
+                interaction_response.setAttribute("id", "interaction-header")
+                interaction_response.textContent = "There is an interaction.";
+                interactions.appendChild(interaction_response);
                 var all_interactions = response.fullInteractionTypeGroup[0]["fullInteractionType"];
                 makeInteractionList(all_interactions);
             } else {
-                var no_interaction = document.createElement("h2");
-                no_interaction.setAttribute("id", "no-interaction-header")
-                no_interaction.textContent = "No known interactions.";
-                interactions.appendChild(no_interaction);
+                // clears the search display upon
+                clearSearchDisplay();
+
+                var interaction_response = document.createElement("h2");
+                interaction_response.setAttribute("id", "no-interaction-header")
+                interaction_response.textContent = "No known interactions.";
+                interactions.appendChild(interaction_response);
             }
             
             // disables button until reset is clicked
@@ -139,6 +168,9 @@ function makeInteractionList(interaction_list){
 document.getElementById('reset-interaction').addEventListener('click', function(event){
     resetInteractionsList();
     resetInteractionComments();
+
+    // clears the search display upon
+    clearSearchDisplay();
     document.getElementById("check-interaction").disabled = false;
 });
 
@@ -151,6 +183,11 @@ function resetInteractionsList(){
 //resets interaction comments
 function resetInteractionComments(){
     interactions.innerHTML = "";
+}
+
+//clears search display
+function clearSearchDisplay(){
+    search_display.innerHTML = "";
 }
 
 //exporting information as PDF file
