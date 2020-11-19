@@ -1,3 +1,15 @@
+.navbar div {
+  margin: auto;
+  padding: 15px 15px;
+}
+
+ul li {
+  list-style-type: none;
+  border-left: 6px solid #7f8eff;
+  padding: 10px 15px;
+  font-size: 20px;
+  
+}
 
 .navbar {
     list-style-type: none;
@@ -11,7 +23,7 @@
     float:left
 }
 
-li a {
+.navbar li a {
     display: block;
     color: white;
     text-align: center;

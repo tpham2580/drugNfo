@@ -4,17 +4,37 @@ import jsPDF from "/node_modules/jspdf/dist/jspdf.es.js";
 document.getElementById('search-med').addEventListener('click', function(event){
     var req1 = new XMLHttpRequest({mozSystem: true});
     var drug = document.getElementById('drug-input').value;
+    var drugRx = "";
 
-    req1.open('GET', 'https://api.fda.gov/drug/ndc.json?api_key=' + 'zziBfeBzqbxtWcpGCv2R320L8vNg7JAeKfWNj64H' + '&search=' + drug + "&limit=1", true);
+    req1.open('GET', 'https://rxnav.nlm.nih.gov/REST/rxcui.json?name=' + drug, true);
     req1.addEventListener('load',function(){
         if(req1.status >= 200 && req1.status < 400){
             var responseDrug = JSON.parse(req1.responseText);
-            document.getElementById('brand-output').textContent = "Brand Name: " + responseDrug.results[0]["brand_name"];
-            document.getElementById('generic-output').textContent = "Generic Name: " + responseDrug.results[0]["generic_name"];
+            
+            var req2 = new XMLHttpRequest({mozSystem: true});
+            req2.overrideMimeType("application/json");
+            var drugRx = responseDrug.idGroup["rxnormId"][0];
+            console.log(drugRx);
+            req2.open('GET', 'https://rxnav.nlm.nih.gov/REST/RxTerms/rxcui/' + drugRx + '/allinfo', true);
+            req2.addEventListener('load',function(){
+                if(req2.status >= 200 && req2.status < 400){
+                    var responseRx = JSON.parse(req2.responseText);
+                    console.log(responseRx);
+                    document.getElementById('brand-output').textContent = "Brand Name: ";
+                    document.getElementById('generic-output').textContent = "Generic Name: ";
+                } else {
+                    console.log("Error in network request: " + req2.statusText);
+                }});
+            req2.send(null);
+
+            document.getElementById('brand-output').textContent = "Brand Name: ";
+            document.getElementById('generic-output').textContent = "Generic Name: ";
         } else {
             console.log("Error in network request: " + req1.statusText);
         }});
     req1.send(null);
+
+
 
     event.preventDefault();
 });
@@ -22,16 +42,15 @@ document.getElementById('search-med').addEventListener('click', function(event){
 // add medication to interaction rxcui list
 var medication_list = [];
 var ul = document.getElementById('interaction-list');
-var interactionsList = [];
 document.getElementById('add-med').addEventListener('click', function(event){
     var req1 = new XMLHttpRequest({mozSystem: true});
     var drug = document.getElementById('drug-input').value;
 
-    req1.open('GET', 'https://api.fda.gov/drug/ndc.json?api_key=' + 'zziBfeBzqbxtWcpGCv2R320L8vNg7JAeKfWNj64H' + '&search=' + drug + "&limit=1", true);
+    req1.open('GET', 'https://rxnav.nlm.nih.gov/REST/rxcui.json?name=' + drug, true);
     req1.addEventListener('load',function(){
         if(req1.status >= 200 && req1.status < 400){
             var responseDrug = JSON.parse(req1.responseText);
-            var rxcui = responseDrug.results[0]["openfda"]["rxcui"][0];
+            var rxcui = responseDrug.idGroup["rxnormId"][0];
             medication_list.push(rxcui);
             makeList(drug);
             document.getElementById("check-interaction").disabled = false;
@@ -64,7 +83,7 @@ document.getElementById('check-interaction').addEventListener('click', function(
         }
     }
 
-    console.log(getInteraction)
+    getInteraction += "&sources=DrugBank"
 
     req2.open('GET', getInteraction, true);
     req2.addEventListener('load',function(){
@@ -77,7 +96,6 @@ document.getElementById('check-interaction').addEventListener('click', function(
                 no_interaction.textContent = "There is an interaction.";
                 interactions.appendChild(no_interaction);
                 var all_interactions = response.fullInteractionTypeGroup[0]["fullInteractionType"];
-                console.log(all_interactions);
                 makeInteractionList(all_interactions);
             } else {
                 var no_interaction = document.createElement("h2");
@@ -127,6 +145,7 @@ document.getElementById('reset-interaction').addEventListener('click', function(
 // resets the unordered list
 function resetInteractionsList(){
     ul.innerHTML = "";
+    medication_list = [];
 };
 
 //resets interaction comments
