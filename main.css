@@ -1,16 +1,35 @@
 .navbar div {
   margin: auto;
-  padding: 15px 15px;
+  padding: 5px 5px;
 }
 
+input {
+  min-width: 265px;
+}
 
+.search {
+  text-align: justify;
+  max-width: 600px;
+}
+
+nav {
+  max-width: 600px;
+}
+
+.instructions {
+  max-width: 580px;
+  text-align: justify;
+}
+
+ul {
+  padding-left: 20px;
+}
 
 ul li {
     list-style-type: none;
-    border-left: 6px solid #7f8eff;
-    padding: 1% 2%;
-    font-size: 20px;
-    
+    border-left: 5px solid #7f8eff;
+    padding: 0.5% 1%;
+    font-size: 17px;
   }
 
 p {
@@ -51,8 +70,8 @@ title h1 {
 .navbar {
     display: flex;
     list-style-type: none;
-    margin: 0;
-    padding: 0;
+    margin: 1;
+    padding: 0px;
     overflow: hidden;
     background-color:#7f8eff;
 }
@@ -62,7 +81,9 @@ title h1 {
 }
 
 .child {
-    margin: 0 auto;
+    margin: 1% auto;
+    padding-left: 1%;
+    padding-right: 1%;
 }
 
 .navbar li {
@@ -73,7 +94,7 @@ title h1 {
     display: block;
     color: white;
     text-align: center;
-    padding: 14px 16px;
+    padding: 5px 8px;
     text-decoration: none;
 }
 
@@ -87,7 +108,7 @@ body {
 
 .container {
     display:flex;
-    justify-content: center;
+    width: auto;
 }
 
 #no-interaction-header {
@@ -142,6 +163,7 @@ button {
 }
 
 #reset-interaction {
+  color: #1c1e21;
   background-color:#cc535f;
   border: 1px solid #cc535f;
 }
@@ -153,6 +175,7 @@ button {
 }
 
 #check-interaction {
+  color: #1c1e21;
   background-color:#5fcc53;
   border: 1px solid #5fcc53;
 }
@@ -165,6 +188,8 @@ button {
 
 .interaction-display {
     padding: 10px 10px;
+    text-align: justify;
+    max-width: 600px;
 }
 
 footer p {
@@ -174,3 +199,4 @@ footer p {
 html {
   padding: 1%
 }
+

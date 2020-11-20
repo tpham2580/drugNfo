@@ -4,33 +4,34 @@ import jsPDF from "./jspdf.es.js";
 var search_display = document.getElementById("search-display");
 
 //asynchronous call to grab drug generic and brand name
-document.getElementById('search-med').addEventListener('click', function(event){
-    var req1 = new XMLHttpRequest({mozSystem: true});
+document.getElementById('search-med').addEventListener('click', async function(event){
     var drug = document.getElementById('drug-input').value;
 
-    req1.open('GET', 'https://rxnav.nlm.nih.gov/REST/rxcui.json?name=' + drug, true);
+    const drugRxCui = await fetch('https://rxnav.nlm.nih.gov/REST/rxcui.json?name=' + drug).then(response => response.json());
+    console.log(drugRxCui.idGroup["rxnormId"][0]);
+    this.drugRxCui = drugRxCui
+
+    const drugSetId = await fetch('https://rxnav.nlm.nih.gov/REST/ndcproperties.json?id=' + this.drugRxCui.idGroup["rxnormId"][0]).then(response => response.json());
+    console.log("setid below");
+    console.log(drugSetId);
+
+
+
+    event.preventDefault();
+});
+
+//asynchronous call to grab top 5 drug side effects
+document.getElementById('search-med').addEventListener('click', function(event){
+    var req1 = new XMLHttpRequest({mozSystem: true});
+    var drug = {"name": document.getElementById('drug-input').value};
+    var side_effect = {"side-effect": "fatigue"}
+
+    req1.open('GET', 'https://www.ehealthme.com/api/v1/ds/' + drug + "/" + side_effect, true);
     req1.addEventListener('load',function(){
         if(req1.status >= 200 && req1.status < 400){
             var responseDrug = JSON.parse(req1.responseText);
-            
-            var req2 = new XMLHttpRequest({mozSystem: true});
-            req2.overrideMimeType("application/json");
-            var drugRx = responseDrug.idGroup["rxnormId"][0];
-            console.log(drugRx);
-            req2.open('GET', 'https://rxnav.nlm.nih.gov/REST/RxTerms/rxcui/' + drugRx + '/allinfo', true);
-            req2.addEventListener('load',function(){
-                if(req2.status >= 200 && req2.status < 400){
-                    var responseRx = JSON.parse(req2.responseText);
-                    console.log(responseRx);
-                    document.getElementById('brand-output').textContent = "Brand Name: ";
-                    document.getElementById('generic-output').textContent = "Generic Name: ";
-                } else {
-                    console.log("Error in network request: " + req2.statusText);
-                }});
-            req2.send(null);
 
-            document.getElementById('brand-output').textContent = "Brand Name: ";
-            document.getElementById('generic-output').textContent = "Generic Name: ";
+            document.getElementById('side-effect-output').textContent = "The top 5 side effects are: ";
         } else {
             console.log("Error in network request: " + req1.statusText);
         }});
@@ -155,12 +156,10 @@ function makeInteractionList(interaction_list){
         h3.className = "interaction-between";
         var comment = document.createElement('p');
         comment.className = "interaction-description"
-        var br = document.createElement('br');
         h3.innerHTML = "There is an interaction between " + drug1 + " and " + drug2;
         comment.innerHTML = interaction_list[drug]["interactionPair"][0]["description"];
         interactions.appendChild(h3)
         interactions.appendChild(comment)
-        interactions.appendChild(br)
     }
 }
 
