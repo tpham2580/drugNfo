@@ -76,10 +76,18 @@ document.getElementById('add-med').addEventListener('click', async function(even
 
     } else {
         var rxcui = await responseDrug.idGroup["rxnormId"][0];
-        var response_generic = await fetch('https://rxnav.nlm.nih.gov/REST/interaction/interaction.json?rxcui=' + rxcui + '&sources=DrugBank').then(response => response.json()).catch(function(error){ console.log(error); });
+        var response = await fetch('https://rxnav.nlm.nih.gov/REST/rxcui/' + rxcui + '/historystatus.json').then(response => response.json()).catch(function(error){ console.log(error); });
+        var response_generic = await response["rxcuiStatusHistory"];
+        console.log(response_generic);
 
-        var generic_name = await response_generic["interactionTypeGroup"][0]["interactionType"][0]["interactionPair"][0]["interactionConcept"][0]["sourceConceptItem"]["name"].toLowerCase();
-        var generic_rxcui = await response_generic["interactionTypeGroup"][0]["interactionType"][0]["interactionPair"][0]["interactionConcept"][0]["minConceptItem"]["rxcui"];
+        if (response_generic["derivedConcepts"] != null){
+            var generic_name = await response_generic["derivedConcepts"]["ingredientConcept"][0]["ingredientName"].toLowerCase();
+            var generic_rxcui = await response_generic["derivedConcepts"]["ingredientConcept"][0]["ingredientRxcui"].toLowerCase();
+        } else {
+            var generic_name = await response_generic["attributes"]["name"].toLowerCase();
+            var generic_rxcui = await response_generic["attributes"]["rxcui"].toLowerCase();
+        }
+        
         if (medication_list_rxcui.includes(generic_rxcui) && !medication_list.includes(drug)){
                 // clears the search display upon
                 clearSearchDisplay();
