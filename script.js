@@ -201,13 +201,39 @@ document.getElementById('check-interaction').addEventListener('click', async fun
 // interaction output create paragraph
 var interactions = document.getElementById("interaction-div");
 function makeInteractionList(interaction_list){
+    console.log(interaction_list);
+    console.log(medication_list_rxcui)
     for (var drug=0; drug<interaction_list.length; drug++){
-        var drug1 = interaction_list[drug]["minConcept"][0]["name"].split(" ")[0];
-        var drug2 = interaction_list[drug]["minConcept"][1]["name"].split(" ")[0];
+        var drug1_rxcui = interaction_list[drug]["minConcept"][0]["rxcui"];
+        for (var rxcui = 0; rxcui < medication_list_rxcui.length; rxcui++){
+            if (medication_list_rxcui[rxcui] == drug1_rxcui){
+                var index_1 = rxcui
+            }
+        }
+
+        var drug2_rxcui = interaction_list[drug]["minConcept"][1]["rxcui"];
+        for (var rxcui = 0; rxcui < medication_list_rxcui.length; rxcui++){
+            if (medication_list_rxcui[rxcui] == drug2_rxcui){
+                var index_2 = rxcui
+            }
+        }
         var h3 = document.createElement('h3');
         h3.className = "interaction-between";
         var comment = document.createElement('p');
-        comment.className = "interaction-description"
+        comment.className = "interaction-description";
+
+        if (medication_list[index_1] == interaction_list[drug]["minConcept"][0]["name"].toLowerCase()){
+            var drug1 = medication_list[index_1];
+        } else {
+            var drug1 = medication_list[index_1] + "[Generic Name: " + interaction_list[drug]["minConcept"][0]["name"].toLowerCase() + "]";
+        }
+
+        if (medication_list[index_2] == interaction_list[drug]["minConcept"][1]["name"].toLowerCase()){
+            var drug2 = medication_list[index_2];
+        } else {
+            var drug2 = medication_list[index_2] + "[Generic Name: " + interaction_list[drug]["minConcept"][1]["name"].toLowerCase() + "]";
+        }
+
         h3.innerHTML = "There is an interaction between " + drug1 + " and " + drug2;
         comment.innerHTML = interaction_list[drug]["interactionPair"][0]["description"];
         interactions.appendChild(h3)
