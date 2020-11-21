@@ -3,6 +3,7 @@ import jsPDF from "./jspdf.es.js";
 // search display div
 var search_display = document.getElementById("search-display");
 
+/*
 //asynchronous call to grab drug generic and brand name
 document.getElementById('search-med').addEventListener('click', async function(event){
     var drug = document.getElementById('drug-input').value;
@@ -19,18 +20,20 @@ document.getElementById('search-med').addEventListener('click', async function(e
 
     event.preventDefault();
 });
+*/
 
+/*
 //asynchronous call to grab top 5 drug side effects
 document.getElementById('search-med').addEventListener('click', function(event){
     var req1 = new XMLHttpRequest({mozSystem: true});
-    var drug = {"name": document.getElementById('drug-input').value};
-    var side_effect = {"side-effect": "fatigue"}
+    var drug = JSON.stringify({"drug": document.getElementById('drug-input').value});
+    var side_effect = JSON.stringify({"side-effect": "fatigue"})
 
     req1.open('GET', 'https://www.ehealthme.com/api/v1/ds/' + drug + "/" + side_effect, true);
     req1.addEventListener('load',function(){
         if(req1.status >= 200 && req1.status < 400){
             var responseDrug = JSON.parse(req1.responseText);
-
+            console.log(responseDrug);
             document.getElementById('side-effect-output').textContent = "The top 5 side effects are: ";
         } else {
             console.log("Error in network request: " + req1.statusText);
@@ -41,51 +44,90 @@ document.getElementById('search-med').addEventListener('click', function(event){
 
     event.preventDefault();
 });
+*/
 
 // add medication to interaction rxcui list
 var medication_list = [];
+var medication_list_rxcui = [];
 var ul = document.getElementById('interaction-list');
-document.getElementById('add-med').addEventListener('click', function(event){
-    var req1 = new XMLHttpRequest({mozSystem: true});
-    var drug = document.getElementById('drug-input').value;
 
-    req1.open('GET', 'https://rxnav.nlm.nih.gov/REST/rxcui.json?name=' + drug, true);
-    req1.addEventListener('load',function(){
-        if(req1.status >= 200 && req1.status < 400){
+// add med to interaction rxcui list using async fetch
+document.getElementById('add-med').addEventListener('click', async function(event){
+    // disables button until finished with task
+    document.getElementById('add-med').disabled = true;
+
+    // resets iteraction comment
+    resetInteractionComments()
+
+    var drug = document.getElementById('drug-input').value.toLowerCase();
+
+    var responseDrug = await fetch('https://rxnav.nlm.nih.gov/REST/rxcui.json?name=' + drug).then(response => response.json()).catch(function(error){ console.log(error); });
+    clearSearchDisplay();
+    var search_display_item = document.createElement('p');
+    search_display_item.textContent = "Searching & Adding...";
+    search_display_item.setAttribute("class", "search-display");
+    search_display.appendChild(search_display_item);
+    if (responseDrug.idGroup["rxnormId"] == undefined){
+        clearSearchDisplay();
+        var search_display_item = document.createElement('p');
+        search_display_item.textContent = '" ' + drug + ' "' + " could not be found";
+        search_display_item.setAttribute("class", "search-display")
+        search_display.appendChild(search_display_item);
+
+    } else {
+        var rxcui = await responseDrug.idGroup["rxnormId"][0];
+        var response_generic = await fetch('https://rxnav.nlm.nih.gov/REST/interaction/interaction.json?rxcui=' + rxcui + '&sources=DrugBank').then(response => response.json()).catch(function(error){ console.log(error); });
+
+        var generic_name = await response_generic["interactionTypeGroup"][0]["interactionType"][0]["interactionPair"][0]["interactionConcept"][0]["sourceConceptItem"]["name"].toLowerCase();
+        var generic_rxcui = await response_generic["interactionTypeGroup"][0]["interactionType"][0]["interactionPair"][0]["interactionConcept"][0]["minConceptItem"]["rxcui"];
+        if (medication_list_rxcui.includes(generic_rxcui) && !medication_list.includes(drug)){
+                // clears the search display upon
+                clearSearchDisplay();
+                
+                if (generic_name == drug){
+                    for (var medication = 0; medication < medication_list_rxcui.length; medication++){
+                        if (medication_list_rxcui[medication] == generic_rxcui){
+                            var index_medication_name = medication;
+                        }
+                    }
+                    var search_display_item = document.createElement('p');
+                    search_display_item.textContent = "There is already a brand version of the drug in the list: " + medication_list[index_medication_name];
+                    search_display_item.setAttribute("class", "search-display")
+                } else {
+                    var search_display_item = document.createElement('p');
+                    search_display_item.textContent = generic_name + " is the generic drug for " + '" ' + drug + ' "';
+                    search_display_item.setAttribute("class", "search-display");
+                }
+                search_display.appendChild(search_display_item);
+        } else if (medication_list_rxcui.includes(generic_rxcui) && medication_list.includes(drug)){
             // clears the search display upon
             clearSearchDisplay();
-
-            var responseDrug = JSON.parse(req1.responseText);
-            if (responseDrug.idGroup["rxnormId"] == undefined){
-                var search_display_item = document.createElement('p');
-                search_display_item.textContent = '" ' + drug + ' "' + " could not be found";
-                search_display_item.setAttribute("class", "search-display")
-                search_display.appendChild(search_display_item);
-            } else {
-                var rxcui = responseDrug.idGroup["rxnormId"][0];
-                if (medication_list.includes(rxcui)){
-                    // clears the search display upon
-                    clearSearchDisplay();
-                    var search_display_item = document.createElement('p');
-                    search_display_item.textContent = '" ' + drug + ' "' + " is already in list";
-                    search_display_item.setAttribute("class", "search-display")
-                    search_display.appendChild(search_display_item);
-                } else {
-                    medication_list.push(rxcui);
-                    makeList(drug);
-                    document.getElementById("check-interaction").disabled = false;
-                }
-                
-            }
-            
+            var search_display_item = document.createElement('p');
+            search_display_item.textContent = '" ' + drug + ' "' + " is already in list";
+            search_display_item.setAttribute("class", "search-display");
+            search_display.appendChild(search_display_item);
         } else {
-            console.log("Error in network request: " + req1.statusText);
-        }});
+            clearSearchDisplay();
 
-    req1.send(null);
+            if (drug != generic_name){
+                var search_display_item = document.createElement('p');
+                search_display_item.textContent = "The generic name for " + drug + " is " + generic_name;
+                search_display_item.setAttribute("class", "search-display");
+                search_display.appendChild(search_display_item);
+            }
+            medication_list_rxcui.push(generic_rxcui);
+            medication_list.push(drug)
+            makeList(drug);
+            document.getElementById("check-interaction").disabled = false;
+        }
+    }
 
     event.preventDefault();
+
+    // reenables buttona after finished
+    document.getElementById('add-med').disabled = false;
 });
+
 
 // adds medication to iteraction list
 function makeList(drug) {
@@ -94,54 +136,56 @@ function makeList(drug) {
     ul.appendChild(li);
 };
 
-//checks for drug interactions
-document.getElementById('check-interaction').addEventListener('click', function(event){
-    var req2 = new XMLHttpRequest({mozSystem: true});
-    var getInteraction = 'https://rxnav.nlm.nih.gov/REST/interaction/list.json?rxcuis=';
-    for (var rx = 0; rx < medication_list.length; rx++){
-        if (rx == 0){
-            getInteraction += medication_list[rx];
-        } else {
-            var add_item = "+" + medication_list[rx];
-            getInteraction += add_item;
-        }
-    }
+//checks for drug interactions using async fetch
+document.getElementById('check-interaction').addEventListener('click', async function(event){
 
-    getInteraction += "&sources=DrugBank"
+    if (medication_list_rxcui && medication_list_rxcui.length > 0){
 
-    req2.open('GET', getInteraction, true);
-    req2.addEventListener('load',function(){
-        if(req2.status >= 200 && req2.status < 400){
-            var response = JSON.parse(req2.responseText);
-            resetInteractionComments();
-            if ("fullInteractionTypeGroup" in response){
-                // clears the search display upon
-                clearSearchDisplay();
-
-                var interaction_response = document.createElement("h2");
-                interaction_response.setAttribute("id", "interaction-header")
-                interaction_response.textContent = "There is an interaction.";
-                interactions.appendChild(interaction_response);
-                var all_interactions = response.fullInteractionTypeGroup[0]["fullInteractionType"];
-                makeInteractionList(all_interactions);
+        var getInteraction = 'https://rxnav.nlm.nih.gov/REST/interaction/list.json?rxcuis=';
+        for (var rx = 0; rx < medication_list.length; rx++){
+            if (rx == 0){
+                getInteraction += medication_list_rxcui[rx];
             } else {
-                // clears the search display upon
-                clearSearchDisplay();
-
-                var interaction_response = document.createElement("h2");
-                interaction_response.setAttribute("id", "no-interaction-header")
-                interaction_response.textContent = "No known interactions.";
-                interactions.appendChild(interaction_response);
+                var add_item = "+" + medication_list_rxcui[rx];
+                getInteraction += add_item;
             }
-            
-            // disables button until reset is clicked
-            document.getElementById("check-interaction").disabled = true;
+        }
 
+        getInteraction += "&sources=DrugBank"
+
+        var response = await fetch(getInteraction).then(response => response.json()).catch(function(error){ console.log(error); });
+        resetInteractionComments();
+        if ("fullInteractionTypeGroup" in response){
+            // clears the search display upon
+            clearSearchDisplay();
+
+            var interaction_response = document.createElement("h2");
+            interaction_response.setAttribute("id", "interaction-header")
+            interaction_response.textContent = "There is an interaction.";
+            interactions.appendChild(interaction_response);
+            var all_interactions = response.fullInteractionTypeGroup[0]["fullInteractionType"];
+            makeInteractionList(all_interactions);
         } else {
-            console.log("Error in network request: " + req2.statusText);
-        }});
+            // clears the search display upon
+            clearSearchDisplay();
 
-    req2.send(null);
+            var interaction_response = document.createElement("h2");
+            interaction_response.setAttribute("id", "no-interaction-header");
+            interaction_response.textContent = "No known interactions.";
+            interactions.appendChild(interaction_response);
+        } 
+
+    } else {
+        // clears the search display upon
+        clearSearchDisplay();
+
+        var interaction_response = document.createElement("h2");
+        interaction_response.textContent = "The Interaction List is empty";
+        interactions.appendChild(interaction_response);
+    }
+    
+    // disables button until reset is clicked
+    document.getElementById("check-interaction").disabled = true;
 
     event.preventDefault();
 });
@@ -177,6 +221,7 @@ document.getElementById('reset-interaction').addEventListener('click', function(
 function resetInteractionsList(){
     ul.innerHTML = "";
     medication_list = [];
+    medication_list_rxcui = [];
 };
 
 //resets interaction comments
