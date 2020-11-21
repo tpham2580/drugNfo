@@ -46,6 +46,63 @@ document.getElementById('search-med').addEventListener('click', function(event){
 });
 */
 
+// referenced Dev Ed's youtube video for help on image carousel
+//
+const carouselSlide = document.querySelector('.carousel-slide');
+const carouselImages = document.getElementsByClassName('image-carousel');
+console.log(carouselImages)
+
+const prev_button = document.querySelector('#prev-button');
+const next_button = document.querySelector('#next-button');
+
+// counter for image location
+let counter = 1;
+const size = 600; // size of image to slide over
+
+// moves one picture forward and sets first image as the actual intended first image
+carouselSlide.style.transform = "translateX(" + (-size * counter) + "px";
+
+// listener for image next button
+next_button.addEventListener('click', ()=>{
+    if (counter >= carouselImages.length - 1) return;
+    carouselSlide.style.transition = "transform 0.4s ease-in-out";
+    counter++; //adds one to counter
+    carouselSlide.style.transform = "translateX(" + (-size * counter) + "px";
+})
+
+// listener for image prev button
+prev_button.addEventListener('click', ()=>{
+    if (counter <= 0) return;
+    carouselSlide.style.transition = "transform 0.4s ease-in-out";
+    counter--; //subtracts one to counter
+    carouselSlide.style.transform = "translateX(" + (-size * counter) + "px";
+})
+
+// listener that goes off every time transition ends
+carouselSlide.addEventListener('transitionend', () => {
+    if (carouselImages[counter].id === 'last-clone'){
+        carouselSlide.style.transition = "none"; // takes out transition so we can translate back to first original pic
+        counter = carouselImages.length - 2; // moves to last
+        carouselSlide.style.transform = "translateX(" + (-size * counter) + "px";
+    }
+    if (carouselImages[counter].id === 'first-clone'){
+        carouselSlide.style.transition = "none"; // takes out transition so we can translate back to first original pic
+        counter = carouselImages.length - counter; // moves to last
+        carouselSlide.style.transform = "translateX(" + (-size * counter) + "px";
+    }
+});
+
+//interval for autoscroll
+function runAutoSxroll() {
+    if (counter >= carouselImages.length - 1) return;
+    carouselSlide.style.transition = "transform 0.4s ease-in-out";
+    counter++; //adds one to counter
+    carouselSlide.style.transform = "translateX(" + (-size * counter) + "px";
+
+    setTimeout(runAutoSxroll, 7200);
+};
+runAutoSxroll(); //calls interval
+
 // add medication to interaction rxcui list
 var medication_list = [];
 var medication_list_rxcui = [];
