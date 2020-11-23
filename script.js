@@ -3,49 +3,6 @@ import jsPDF from "./jspdf.es.js";
 // search display div
 var search_display = document.getElementById("search-display");
 
-/*
-//asynchronous call to grab drug generic and brand name
-document.getElementById('search-med').addEventListener('click', async function(event){
-    var drug = document.getElementById('drug-input').value;
-
-    const drugRxCui = await fetch('https://rxnav.nlm.nih.gov/REST/rxcui.json?name=' + drug).then(response => response.json());
-    console.log(drugRxCui.idGroup["rxnormId"][0]);
-    this.drugRxCui = drugRxCui
-
-    const drugSetId = await fetch('https://rxnav.nlm.nih.gov/REST/ndcproperties.json?id=' + this.drugRxCui.idGroup["rxnormId"][0]).then(response => response.json());
-    console.log("setid below");
-    console.log(drugSetId);
-
-
-
-    event.preventDefault();
-});
-*/
-
-/*
-//asynchronous call to grab top 5 drug side effects
-document.getElementById('search-med').addEventListener('click', function(event){
-    var req1 = new XMLHttpRequest({mozSystem: true});
-    var drug = JSON.stringify({"drug": document.getElementById('drug-input').value});
-    var side_effect = JSON.stringify({"side-effect": "fatigue"})
-
-    req1.open('GET', 'https://www.ehealthme.com/api/v1/ds/' + drug + "/" + side_effect, true);
-    req1.addEventListener('load',function(){
-        if(req1.status >= 200 && req1.status < 400){
-            var responseDrug = JSON.parse(req1.responseText);
-            console.log(responseDrug);
-            document.getElementById('side-effect-output').textContent = "The top 5 side effects are: ";
-        } else {
-            console.log("Error in network request: " + req1.statusText);
-        }});
-    req1.send(null);
-
-
-
-    event.preventDefault();
-});
-*/
-
 // referenced Dev Ed's youtube video for help on image carousel
 //
 const carouselSlide = document.querySelector('.carousel-slide');
@@ -103,10 +60,45 @@ function runAutoSxroll() {
 };
 runAutoSxroll(); //calls interval
 
-// add medication to interaction rxcui list
+// initializes medication list and rxcui list
 var medication_list = [];
 var medication_list_rxcui = [];
 var ul = document.getElementById('interaction-list');
+
+// adds medication to interaction list display
+function makeList(drug) {
+    var li = document.createElement('li');
+    li.innerHTML = drug;
+    ul.appendChild(li);
+};
+
+// reset interaction list and comments
+document.getElementById('reset-interaction').addEventListener('click', function(event){
+    resetInteractionsList();
+    resetInteractionComments();
+
+    // clears the search display upon and reenables the check-interaction button
+    clearSearchDisplay();
+    document.getElementById("check-interaction").disabled = false;
+});
+
+// resets the unordered list
+function resetInteractionsList(){
+    ul.innerHTML = "";
+    medication_list = [];
+    medication_list_rxcui = [];
+};
+
+//resets interaction comments
+function resetInteractionComments(){
+    interactions.innerHTML = "";
+}
+
+//clears search display
+function clearSearchDisplay(){
+    search_display.innerHTML = "";
+}
+
 
 // add med to interaction rxcui list using async fetch
 document.getElementById('add-med').addEventListener('click', async function(event){
@@ -192,14 +184,6 @@ document.getElementById('add-med').addEventListener('click', async function(even
     // reenables buttona after finished
     document.getElementById('add-med').disabled = false;
 });
-
-
-// adds medication to iteraction list
-function makeList(drug) {
-    var li = document.createElement('li');
-    li.innerHTML = drug;
-    ul.appendChild(li);
-};
 
 //checks for drug interactions using async fetch
 document.getElementById('check-interaction').addEventListener('click', async function(event){
@@ -298,33 +282,6 @@ function makeInteractionList(interaction_list){
     }
 }
 
-// reset interaction list and comments
-document.getElementById('reset-interaction').addEventListener('click', function(event){
-    resetInteractionsList();
-    resetInteractionComments();
-
-    // clears the search display upon
-    clearSearchDisplay();
-    document.getElementById("check-interaction").disabled = false;
-});
-
-// resets the unordered list
-function resetInteractionsList(){
-    ul.innerHTML = "";
-    medication_list = [];
-    medication_list_rxcui = [];
-};
-
-//resets interaction comments
-function resetInteractionComments(){
-    interactions.innerHTML = "";
-}
-
-//clears search display
-function clearSearchDisplay(){
-    search_display.innerHTML = "";
-}
-
 //exporting information as PDF file
 document.getElementById('export-pdf').addEventListener('click', function(event){
     var pdf = new jsPDF();
@@ -387,6 +344,6 @@ document.getElementById('export-pdf').addEventListener('click', function(event){
 
 
 
-    pdf.save("medications.pdf")
+    pdf.save("DrugNfo-Interactions.pdf")
 });
 
